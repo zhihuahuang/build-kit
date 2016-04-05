@@ -1,0 +1,32 @@
+{
+  "name": "build-kit",
+  "version": "0.0.1",
+  "description": "A Front End Build Kit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "frontend",
+    "fe",
+    "build",
+    "kit",
+    "html",
+    "css",
+    "js"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.0.0-rc.2",
+    "clean-css": "^3.4.11",
+    "html-minifier": "^1.4.0",
+    "imagemin": "^4.0.0",
+    "imagemin-mozjpeg": "^5.1.0",
+    "uglify-js": "^2.6.2",
+    "uncss": "^0.13.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5"
+  }
+}
