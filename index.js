@@ -1,5 +1,18 @@
+/*
+ * Require Node Modules
+ */
 var fs = require('fs');
+var path = require('path');
 
+/*
+ * Require Tools Modules
+ */
+var mkdirp = require('mkdirp');
+var async = require('async');
+
+/*
+ * Require Build Modules
+ */
 var HtmlMinify = require('html-minifier').minify;
 var CleanCSS = require('clean-css');
 var UglifyJS = require('uglify-js');
@@ -7,8 +20,9 @@ var UglifyJS = require('uglify-js');
 var Imagemin = require('imagemin');
 var imageminMozjpeg = require('imagemin-mozjpeg');
 
-var async = require('async');
-
+/*
+ * Base Function
+ */
 function emptyFunction() {};
 
 function isFunction(func) {
@@ -19,41 +33,111 @@ function isDirSync(path) {
     return fs.statSync(path).isDirectory();
 }
 
+/*
+ * HTML
+ */
+exports.minifyHTML = function (str, options, callback) {
+    (callback || emptyFunction)(null, HtmlMinify(str, options));
+};
+
+exports.minifyHTMLFile = function (inFile, outFile, options, callback) {
+    var outDir = path.dirname(outFile);
+    mkdirp(outDir, function (err) {
+        fs.readFile(inFile, 'utf-8', function (err, data) {
+            fs.writeFile(outFile, HtmlMinify(data, options), 'utf-8', callback);
+        });
+    });
+};
+
+/* 
+ * JS
+ */
+
 /**
  * Minify JavaScript Code
  *
- * minifyJavaScript(string, [option], callback)
+ * minifyJavaScript(string, [options], callback)
+ *
+ * callback(err, data, instance)
  */
-exports.minifyJavaScript = function (string, option, callback) {
-
-}
+exports.minifyJavaScript = (function f(str, options, callback) {
+    if (isFunction(options)) {
+        f(str, {}, callback);
+    } else {
+        var result = UglifyJS.minify(str, options);
+        (callback || emptyFunction)(null, result.code, result);
+    }
+});
 
 /**
  * Minify JS File
  *
- * 
+ * minifyJSFile(src, dest, [options], callback)
+ *
+ * callback(err, instance)
  */
-exports.minifyJS = (function f(src, dest, option, callback) {
-    if (isFunction(option)) {
-        f(src, dest, null, option);
-    } else {
-        var result = UglifyJS.minify(src, option);
-
-        // Output js file
-        var task = [function (cb) {
-            fs.writeFile(dest, result.code, callback);
-        }];
-
-        // Output map file
-        if (option.outSourceMap) {
-            task.push(function (cb) {
-                fs.writeFile(option.outSourceMap, result.map, cb);
-            });
+exports.minifyJSFile = (function f(src, dest, options, callback) {
+    options = options || {};
+    if (isFunction(options)) {
+        f(src, dest, {}, options);
+    } else if (isDirSync(src)) {
+        //  TODO
+        if (isDirSync(dest)) {
+            
         }
-
-        async.parallel(task, callback);
+        else {
+            
+        }
+        
+    } else {
+        // Src is file
+        
+        if(isDirSync(dest)) {
+            // Dest is Dir
+            dest = dest + '/' + path.basename(src);
+        }
+        
+        mkdirp(path.dirname(dest), function (err) {
+            var result = UglifyJS.minify(src, options);
+            fs.writeFile(dest, result.code, 'utf-8', function (err) {
+                if (options.outSourceMap) {
+                    // Output map file
+                    fs.writeFile(options.outSourceMap, result.map, function (err) {
+                        (callback || emptyFunction)(err, result);
+                    });
+                } else {
+                    (callback || emptyFunction)(err, result);
+                }
+            });
+        });
     }
+
+    return this;
 });
+
+/*
+ * CSS
+ */
+exports.minifyCSS = function (str, options, callback) {
+    new CleanCSS(options).minify(str, function (error, minified) {
+        (callback || emptyFunction)(error, minified.styles);
+    });
+};
+
+exports.minifyCSSFile = function (inFile, outFile, options, callback) {
+    var outDir = path.dirname(outFile);
+    mkdirp(outDir, function (err) {
+        fs.readFile(inFile, 'utf-8', function (err, data) {
+            new CleanCSS(options).minify(data, function (error, minified) {
+                fs.writeFile(outFile, minified.styles, 'utf-8', callback);
+            });
+        });
+    });
+}
+
+/*
+* Image
+*/
 
 /**
  * Minify PNG File
@@ -82,7 +166,7 @@ exports.minifyJPEG = (function f(src, dest, option, callback) {
         return f(src, dest, null, option);
     }
 
-//    var imageMin = new Imagemin().use(imageminMozjpeg(option));
+    //    var imageMin = new Imagemin().use(imageminMozjpeg(option));
     console.log(src, isDirSync(src), dest, option);
 
     if (isDirSync(src)) {
