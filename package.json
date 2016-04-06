@@ -1,5 +1,5 @@
 {
-  "name": "build-kit",
+  "name": "buildkit",
   "version": "0.0.1",
   "description": "A Front End Build Kit",
   "main": "index.js",
@@ -23,6 +23,7 @@
     "html-minifier": "^1.4.0",
     "imagemin": "^4.0.0",
     "imagemin-mozjpeg": "^5.1.0",
+    "imagemin-pngquant": "^4.2.2",
     "mkdirp": "^0.5.1",
     "uglify-js": "^2.6.2",
     "uncss": "^0.13.0"
