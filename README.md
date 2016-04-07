@@ -1,8 +1,10 @@
 # buildkit
-A Front-End Build Kit.
+[![Build Status](https://travis-ci.org/zhihuahuang/buildkit.svg)](https://travis-ci.org/zhihuahuang/buildkit)
+
+A front-end build kit.
 
 ## API
-it's easy to use.
+It's easy to use.
 
 ### HTML
 #### minifyHTMLFile(src, dest, [options], [callback])
