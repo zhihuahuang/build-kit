@@ -19,6 +19,18 @@ buildKit.mkdirp(__dirname + '/build/zepto', function () {
     });
 });
 
+// CSS
+buildKit.minifyCSSFile(__dirname + '/src/bootstrap.css', __dirname + '/build/bootstrap.min.css', function() {
+    console.log('minifyCSSFile Done');
+});
+
+
+buildKit.mkdirp(__dirname + '/build/bootstrap', function () {
+    buildKit.minifyCSSFile(__dirname + '/src/bootstrap', __dirname + '/build/bootstrap', function () {
+        console.log('minifyCSSFile Done');
+    });
+});
+
 // buildKit HTML
 buildKit.minifyHTMLFile(__dirname + '/src/index.html', __dirname + '/build/index.html', function () {
     console.log('minifyHTMLFile Done');
@@ -26,12 +38,4 @@ buildKit.minifyHTMLFile(__dirname + '/src/index.html', __dirname + '/build/index
 
 buildKit.minifyHTMLFile(__dirname + '/src/html', __dirname + '/build/html', function () {
     console.log('minifyHTMLFile Done');
-});
-
-buildKit.minifyCSSFile(__dirname + '/src/bootstrap.css', __dirname + '/build/bootstrap.min.css', function() {
-    console.log('minifyCSSFile Done');
-});
-
-buildKit.minifyCSSFile(__dirname + '/src/bootstrap', __dirname + '/build/bootstrap', function() {
-    console.log('minifyCSSFile Done');
 });

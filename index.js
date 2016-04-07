@@ -17,10 +17,6 @@ var HtmlMinify = require('html-minifier').minify;
 var CleanCSS = require('clean-css');
 var UglifyJS = require('uglify-js');
 
-var Imagemin = require('imagemin');
-var imageminMozjpeg = require('imagemin-mozjpeg');
-var imageminPngquant = require('imagemin-pngquant');
-
 /*
  * Base Function
  */
@@ -242,7 +238,7 @@ exports.minifyCSSFile = (function f(src, dest, options, callback) {
                 // Dest is file
                 var source = '';
                 files.forEach(function(file) {
-                    source += fs.readFileSync(file, 'utf-8');
+                    source += fs.readFileSync(src + path.sep + file, 'utf-8');
                 });
                 
                 new CleanCSS(options).minify(source, function (error, minified) {
@@ -267,71 +263,4 @@ exports.minifyCSSFile = (function f(src, dest, options, callback) {
         });
     }
     return this;
-});
-
-/*
- * Image
- */
-
-var minifyImage = (function f(src, dest, plugin, callback) {
-    if (isDirSync(dest)) {
-        new Imagemin()
-            .src(src)
-            .dest(dest)
-            .use(plugin)
-            .run(function (err, files) {
-                callback(err);
-            });
-    } else {
-        new Imagemin()
-            .src(src)
-            .use(plugin)
-            .run(function (err, files) {
-                if (err) {
-                    throw err;
-                }
-                fs.createWriteStream(dest).on('open', function (fd) {
-                    fs.write(fd, files[0].contents, 0, files[0].contents.length, 0, function (err) {
-                        fs.close(fd, function () {
-                            (callback || emptyFunction)(err);
-                        });
-                    });
-                });
-            });
-    }
-});
-
-/**
- * Minify PNG File
- *
- * 
- */
-exports.minifyPNG = (function f(src, dest, option, callback) {
-    if (isFunction(option)) {
-        return f(src, dest, null, option);
-    }
-
-    minifyImage(src, dest, imageminPngquant(option), callback);
-});
-
-/**
- * Minify JPEG File
- *
- * minifyJPEG(src, dest, [option], [callback]);
- *
- * Use imagemin-mozjpeg
- * 
- * Option see Github: <a href="https://github.com/imagemin/imagemin-mozjpeg">imagemin-mozjpeg<a/>
- */
-exports.minifyJPEG = (function f(src, dest, option, callback) {
-    if (isFunction(option)) {
-        return f(src, dest, null, option);
-    }
-
-    if (isDirSync(src)) {
-        src += '/*.jpg';
-        mkdirp(dest);
-    }
-
-    minifyImage(src, dest, imageminMozjpeg(option), callback);
 });
